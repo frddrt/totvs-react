@@ -1,0 +1,94 @@
+/**
+ * @author Frederico Ferracini Duarte
+ * @since 2024-01-23 10:33:05
+ */
+
+#include "ferracini.ch"
+
+Namespace ferracini.api
+
+class GenericService
+	private data filter as Array
+	private data order as Character
+	private data page as Numeric
+	private data pageSize as Numeric
+	private data request as Json
+	private data fields as Character
+
+	public method new() constructor
+	public method createAdapter(verbo as Character) as Object
+	public method getData() as Json
+	public method setRequest(request as Json)
+endclass
+
+method new() class GenericService
+	self:filter := {}
+	self:order := ""
+	self:fields := ""
+return self
+
+method getData() as Json class GenericService
+	Local result := JsonObject():new() as Json
+	Local adapter := self:createAdapter("GET") as Object
+
+	Default self:page := 1
+	Default self:pageSize := 10
+
+	adapter:setPage(self:page)
+	adapter:setPageSize(self:pageSize)
+
+	IF (! empty(self:filter) )
+		adapter:setUrlFilter(self:filter)
+	ENDIF
+
+	IF ! empty(self:order)
+		adapter:setOrderQuery(self:order)
+	ENDIF
+
+	IF ! empty(self:fields)
+		adapter:setFields(self:fields)
+	ENDIF
+
+	adapter:getPage()
+
+	result["success"] := adapter:lOk
+
+	IF adapter:lOk
+		result["payload"] := adapter:getJSONResponse()
+	ELSE
+		result["code"] := adapter:getCode()
+		result["message"] := "Não foi possível consultar o adaptador"
+		result["detailedMessage"] := adapter:getMessage()
+	ENDIF
+
+	adapter:deActivate()
+	freeObj(adapter)
+return result
+
+method setRequest(request as Json) class GenericService
+	Local keys as Array, key as Character, i as Numeric
+
+	self:request := request
+	self:page := 1
+	self:pageSize := 10
+	self:filter := {}
+	self:fields := ""
+
+	keys := request:getNames()
+
+	FOR (key, i OF keys)
+		DO CASE
+			CASE key == "page"     ; self:page := val(request[key])
+			CASE key == "pagesize" ; self:pageSize := val(request[key])
+			CASE key == "order"    ; self:order := request[key]
+			CASE key == "orderby"  ; self:order := request[key]
+			CASE key == "$orderby" ; self:order := request[key]
+			CASE key == "fields"   ; self:fields := request[key]
+			CASE key == "select"   ; self:fields := request[key]
+			CASE key == "$select"  ; self:fields := request[key]
+			case key == "$filter"  ; aAdd(self:filter, {"filter", request[key]})
+			OTHERWISE              ; aAdd(self:filter, {key, request[key]})
+		ENDCASE
+	NEXT
+return
+

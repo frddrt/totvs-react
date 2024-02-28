@@ -1,0 +1,196 @@
+/**
+ * @author Frederico Ferracini Duarte
+ * @since 2023-08-02 09:31:22
+ */
+
+#include "ferracini.ch"
+
+Namespace ferracini.api
+
+class GenericAdapter from FWAdapterBaseV2
+	private data localFields as Array
+	private data hashFields as Object
+	private data table as Character
+
+	public method new(verbo)
+	public method getPage()
+	public method putData(chave as Character, ordem as Numeric, body as Json) as Logical
+	public method postData(body as Json) as Logical
+	public method deleteData(chave as Character, ordem as Numeric) as Logical
+
+	private method setTable(table as Character)
+	private method setLocalFields()
+	private method addField(nickname as Character, fieldname as Character)
+	private method setHashFields()
+	private method mapFields()
+	private method buildQuery()
+	private method convert(value as Variant) as Variant
+endclass
+
+method new(verbo as Character) class GenericAdapter
+	_Super:new(verbo, true)
+return self
+
+method setTable(table as Character) class GenericAdapter
+	self:table := table
+	self:setLocalFields()
+	self:setHashFields()
+return
+
+method setLocalFields() class GenericAdapter
+	Local area := getNextAlias()
+
+	self:localFields := {}
+
+	BEGINSQL ALIAS area
+		SELECT
+			X3_CAMPO
+		FROM
+			%table:SX3% SX3
+		WHERE
+			SX3.%notdel% AND
+			X3_ARQUIVO = %exp:self:table% AND
+			X3_CONTEXT <> 'V'
+	ENDSQL
+
+	while ! (area)->( EOF() )
+		self:addField(allTrim(X3_CAMPO), allTrim(X3_CAMPO))
+		(area)->( dbSkip() )
+	end
+
+	(area)->( dbCloseArea() )
+return
+
+method addField(nickname as Character, fieldname as Character) class GenericAdapter
+	Local sx3Field := fwTamSx3(fieldname)
+
+	aAdd(self:localFields, {nickname, fieldname, true, false, fieldname, sx3Field[3], sx3Field[1], sx3Field[2]})
+return
+
+method setHashFields() class GenericAdapter
+	Local i as Numeric
+
+	self:hashFields := THashMap():new()
+
+	FOR i := 1 TO len(self:localFields)
+		self:hashFields:set(lower(self:localFields[i][1]), self:localFields[i][2])
+	NEXT
+return
+
+method mapFields() class GenericAdapter
+	Local i as Numeric
+
+	FOR i := 1 TO len(self:localFields)
+		self:addMapFields(;
+			self:localFields[i][1], self:localFields[i][2], self:localFields[i][3], self:localFields[i][4],;
+			{self:localFields[i][5], self:localFields[i][6], self:localFields[i][7], self:localFields[i][8]};
+		)
+	NEXT
+
+	self:addMapFields("recno", "R_E_C_N_O_", true, false, {"R_E_C_N_O_" , "N", 12, 0}, "R_E_C_N_O_")
+return
+
+method buildQuery() class GenericAdapter
+	Local stringBuilder := StringBuilder():new()
+
+	stringBuilder:addMany(;
+		" SELECT #QueryFields#",;
+		" FROM ", retSQLName(self:table), " ", self:table, " ",;
+		" WHERE #QueryWhere#";
+	)
+
+	self:setQuery(stringBuilder:toString())
+	freeObj(stringBuilder)
+return
+
+method getPage() class GenericAdapter
+	Local stringBuilder := StringBuilder():new()
+
+	self:mapFields()
+	self:buildQuery()
+
+	stringBuilder:addMany(self:table, ".D_E_L_E_T_ = ' ' ")
+
+	self:setWhere(stringBuilder:toString())
+
+	IF self:execute()
+		self:fillGetResponse()
+	ENDIF
+return
+
+method convert(value as Variant) as Variant class GenericAdapter
+	Local retorno := value as Variant, tipo as Character
+
+	tipo := valType(value)
+
+	IF tipo == 'C'
+		retorno := alltrim(DecodeUtf8(value, "cp1252") )
+	ENDIF
+Return( retorno )
+
+method putData(chave as Character, ordem as Numeric, body as Json) as Logical class GenericAdapter
+	Local fields as Array, field as Character, fieldName as Character, i as Numeric, updData := {} as Array
+	Local result := false as Logical
+
+	fields := body:getNames()
+
+	FOR (field, i OF fields)
+		IF self:hashFields:get(field, @fieldName)
+			aAdd(updData, {fieldName, body[field]})
+		ENDIF
+	NEXT
+
+	(self:table)->( dbSetOrder(ordem) )
+	IF (self:table)->( dbSeek(xFilial(self:table) + chave) )
+		recLock(self:table, false)
+
+		FOR i := 1 TO len(updData)
+			(self:table)->( fieldPut(fieldPos(updData[i][1]), self:convert(updData[i][2])) )
+		NEXT
+
+		msUnlock()
+		msUnlockAll()
+
+		result := true
+	ENDIF
+return result
+
+method postData(body as Json) as Logical class GenericAdapter
+	Local fields as Array, field as Character, fieldName as Character, i as Numeric, updData := {} as Array
+	Local result := false as Logical
+
+	fields := body:getNames()
+
+	FOR (field, i OF fields)
+		IF self:hashFields:get(field, @fieldName)
+			aAdd(updData, {fieldName, body[field]})
+		ENDIF
+	NEXT
+
+	recLock(self:table, true)
+
+	FOR i := 1 TO len(updData)
+		(self:table)->( fieldPut(fieldPos(updData[i][1]), self:convert(updData[i][2])) )
+	NEXT
+
+	msUnlock()
+	msUnlockAll()
+
+	result := true
+return result
+
+method deleteData(chave as Character, ordem as Numeric) as Logical class GenericAdapter
+	Local result := false as Logical
+
+	(self:table)->( dbSetOrder(ordem) )
+	IF (self:table)->( dbSeek(xFilial(self:table) + chave) )
+		recLock(self:table, false)
+
+		(self:table)->( dbDelete() )
+
+		msUnlock()
+		msUnlockAll()
+
+		result := true
+	ENDIF
+return result

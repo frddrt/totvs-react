@@ -1,0 +1,44 @@
+/**
+ * @author Frederico Ferracini Duarte
+ * @since 2023-08-24 12:45:18
+ */
+
+#include "ferracini.ch"
+
+class GenericController
+	private data iHaveToClose as Logical
+
+	public method new() constructor
+	private method openConn()
+	private method closeConn()
+endclass
+
+method new() class GenericController
+	self:iHaveToClose := false
+return self
+
+method openConn(oRest as Object) class GenericController
+	Local head as Json, tenantId as Character, keys := {"tenantId", "tenantid", "TENANTID", "TenantId"} as Array, i as Numeric, key as Character
+
+	IF select("SX2") == 0
+		self:iHaveToClose := true
+		head := oRest:getHeaderRequest()
+
+		FOR (key, i OF keys)
+			IF head:hasProperty(key)
+				exit
+			ENDIF
+		NEXT
+
+		tenantId := head[key]
+
+		rpcSetEnv(left(tenantId, 2), right(tenantId, 2))
+	ENDIF
+return
+
+method closeConn() class GenericController
+	IF self:iHaveToClose
+		self:iHaveToClose := false
+		rpcClearEnv()
+	ENDIF
+return
