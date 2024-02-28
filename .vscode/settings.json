@@ -1,0 +1,10 @@
+{
+	"editor.rulers": [80, 120],
+	"editor.codeActionsOnSave": {
+		"source.organizeImports": "explicit"
+	},
+	"files.trimTrailingWhitespace": true,
+	"editor.trimAutoWhitespace": true,
+	"totvsLanguageServer.welcomePage": false,
+	"totvsLanguageServer.editor.linter.includes": "/Users/frddrt/workspace/totvs/includes;"
+}
