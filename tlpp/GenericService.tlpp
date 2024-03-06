@@ -18,6 +18,7 @@ class GenericService
 	public method new() constructor
 	public method createAdapter(verbo as Character) as Object
 	public method getData() as Json
+	public method putData(id as Character, order as Numeric, body as Json) as Json
 	public method setRequest(request as Json)
 endclass
 
@@ -92,3 +93,12 @@ method setRequest(request as Json) class GenericService
 	NEXT
 return
 
+method putData(id as Character, order as Numeric, body as Json) as Json class GenericService
+	Local adapter := self:createAdapter("PUT") as Object
+	Local result := JsonObject():new() as Json
+
+	result["success"] := adapter:putData(id, 1, body)
+
+	adapter:deActivate()
+	freeObj(adapter)
+return result
