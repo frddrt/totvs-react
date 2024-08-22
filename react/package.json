@@ -20,7 +20,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "npm run build:build && npm run build:rmmap && npm run build:rename && npm run build:zip && npm run build:unrename",
+    "build": "concurrently npm:build:*",
     "build:build": "react-scripts build",
     "build:rmmap": "rm ./build/static/js/*.map",
     "build:rename": "mv build template && touch template.app",
@@ -53,6 +53,7 @@
     "@types/node": "^16.18.39",
     "@types/react": "^18.2.18",
     "@types/react-dom": "^18.2.7",
+	"concurrently": "^8.2.2",
     "sass": "^1.63.6"
   },
   "proxy": "http://192.168.0.8:9000/rest"
