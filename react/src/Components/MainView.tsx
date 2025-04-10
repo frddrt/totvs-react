@@ -25,6 +25,15 @@ const MainView = () => {
 			if (key === "<YOUR_KEY>") {
 			}
 		}
+
+		const pre = JSON.parse(window.localStorage.getItem("pre") || "[]")
+
+		for (const key of pre) {
+			const value = window.localStorage.getItem(key)
+			window.observeProtheus(key, value)
+		}
+
+		window.localStorage.removeItem("pre")
 	}, [])
 
 	return (
