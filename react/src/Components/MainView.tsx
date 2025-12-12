@@ -5,7 +5,7 @@
 
 import { useEffect } from "react"
 import { Container } from "react-bootstrap"
-import { useRecoilValue } from "recoil"
+import { useAtomValue } from "jotai"
 import { If } from "../Library/If"
 import { AppState } from "../Store/atom"
 
@@ -18,7 +18,7 @@ declare global {
 window.observeProtheus = window.observeProtheus || {}
 
 const MainView = () => {
-	const appState = useRecoilValue(AppState)
+	const appState = useAtomValue(AppState)
 
 	useEffect(() => {
 		window.observeProtheus = (key: string, value: any) => {

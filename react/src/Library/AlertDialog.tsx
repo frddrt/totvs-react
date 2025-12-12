@@ -3,7 +3,7 @@
  * @since 2024-02-14 12:16:46
  */
 
-import { Button, Modal, ModalProps } from "react-bootstrap"
+import { Button, Modal, type ModalProps } from "react-bootstrap"
 import { If } from "./If"
 
 export interface AlertDialogState {

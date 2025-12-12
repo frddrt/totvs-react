@@ -4,7 +4,7 @@
  */
 
 import { Col, Container, Nav, Row } from "react-bootstrap"
-import { useRecoilState } from "recoil"
+import { useAtom } from "jotai"
 import { AppState } from "../Store/atom"
 
 type NavItemProps = {
@@ -31,7 +31,7 @@ const NavItem = ({title, icon, selected, onClick}: NavItemProps) => {
 }
 
 export const NavSide = () => {
-	const [appState, setAppState] = useRecoilState(AppState)
+	const [appState, setAppState] = useAtom(AppState)
 
 	return (
 		<Container fluid className='d-flex bg-dark pt-1 ps-0 pe-0'>

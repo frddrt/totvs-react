@@ -4,11 +4,12 @@
  */
 
 import { Pagination } from "react-bootstrap"
-import { useRecoilState } from "recoil"
+import { useAtom } from "jotai"
+import type { JSX } from "react"
 import { PageState } from "../Store/atom"
 
 export const MyPagination = () => {
-	const [pageState, setPageState] = useRecoilState(PageState)
+	const [pageState, setPageState] = useAtom(PageState)
 	const { First, Prev, Ellipsis, Item, Next, Last } = Pagination
 	const { current, total } = pageState
 	const {ini, end} = getIniAndEndValues()

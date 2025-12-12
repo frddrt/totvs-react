@@ -3,8 +3,9 @@
  * @since 2023-08-01 16:02:14
  */
 
+import type { JSX } from "react"
 import { Col, Row } from "react-bootstrap"
-import { useRecoilValue } from "recoil"
+import { useAtomValue } from "jotai"
 import { If } from "../Library/If"
 import { WaitScreen } from "../Library/WaitScreen"
 import { Wait } from "../Store/atom"
@@ -12,7 +13,7 @@ import MainView from "./MainView"
 import { NavSide } from "./NavSide"
 
 export const App: () => JSX.Element = () => {
-	const wait = useRecoilValue(Wait)
+	const wait = useAtomValue(Wait)
 
 	return (
 		<Row className="app-row">

@@ -12,8 +12,8 @@ body {
 	  monospace;
   }
 
-  @import 'node_modules/bootstrap/scss/bootstrap';
-  @import 'node_modules/bootstrap-icons/font/bootstrap-icons';
+  @import '../node_modules/bootstrap/scss/bootstrap';
+  @import '../node_modules/bootstrap-icons/font/bootstrap-icons';
 
   .fs-small {
 	  font-size: small!important;
@@ -25,6 +25,14 @@ body {
 
   .fs-xxsmall {
 	  font-size: xx-small!important;
+  }
+
+  .main-view-height {
+	height: calc(100vh - 10em);
+  }
+
+  .margin-top-side {
+	margin-top: 3em;
   }
 
   .menu-item {

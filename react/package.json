@@ -1,33 +1,32 @@
 {
   "name": "template",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "homepage": ".",
+  "type": "module",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "bootstrap": "^5.3.0",
-    "bootstrap-icons": "^1.10.5",
-    "moment-timezone": "^0.5.43",
-    "odata-query": "^7.0.4",
-    "react": "^18.2.0",
-    "react-bootstrap": "^2.8.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "5.0.1",
-    "recoil": "^0.7.7",
-    "web-vitals": "^2.1.4"
+    "bootstrap": "^5.3.8",
+    "bootstrap-icons": "^1.13.1",
+    "jotai": "^2.16.0",
+    "moment-timezone": "^0.6.0",
+    "odata-query": "^8.0.7",
+    "react": "^19.2.1",
+    "react-bootstrap": "^2.10.10",
+    "react-dom": "^19.2.1",
+    "react-router-dom": "^7.10.1",
+    "web-vitals": "^5.1.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "concurrently npm:build:*",
-    "build:build": "react-scripts build",
+    "start": "rsbuild dev",
+    "clean": "rm -Rf node_modules && rm *.app && rm -Rf build",
+    "build": "npm run build:build && npm run build:rename && npm run build:zip && npm run build:unrename",
+    "build:build": "rsbuild build",
     "build:rmmap": "rm ./build/static/js/*.map",
     "build:rename": "mv build template && touch template.app",
     "build:zip": "rm template.app && zip -r9v template.app template",
     "build:unrename": "mv template build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+	"preview": "rsbuild preview",
+	"test": "rsbuild test"
   },
   "eslintConfig": {
     "extends": [
@@ -48,13 +47,15 @@
     ]
   },
   "devDependencies": {
-    "typescript": "^4.9.5",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.39",
-    "@types/react": "^18.2.18",
-    "@types/react-dom": "^18.2.7",
-	"concurrently": "^8.2.2",
-    "sass": "^1.63.6"
+    "@rsbuild/core": "^1.6.14",
+    "@rsbuild/plugin-react": "^1.4.2",
+    "@rsbuild/plugin-sass": "^1.4.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.0",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "sass": "^1.95.1",
+    "typescript": "^5.9.3"
   },
-  "proxy": "http://192.168.0.8:9000/rest"
+  "proxy": "http://localhost:9000/rest"
 }
