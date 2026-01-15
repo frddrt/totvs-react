@@ -23,6 +23,7 @@ server: {
     },
   },
   output: {
+	assetPrefix: './',
     distPath: {
       root: 'build',
     },

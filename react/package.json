@@ -19,8 +19,9 @@
   "scripts": {
     "start": "rsbuild dev",
     "clean": "rm -Rf node_modules && rm *.app && rm -Rf build",
-    "build": "npm run build:build && npm run build:rename && npm run build:zip && npm run build:unrename",
-    "build:build": "rsbuild build",
+    "build": "npm run build:build && npm run build:fix-css && npm run build:rename && npm run build:zip && npm run build:unrename",
+    "build:build": "NODE_ENV=production rsbuild build",
+	"build:fix-css": "sed -i '' 's|url(./static|url(../../static|g' build/static/css/*.css",
     "build:rmmap": "rm ./build/static/js/*.map",
     "build:rename": "mv build template && touch template.app",
     "build:zip": "rm template.app && zip -r9v template.app template",
