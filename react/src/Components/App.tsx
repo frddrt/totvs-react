@@ -11,9 +11,12 @@ import { WaitScreen } from "../Library/WaitScreen"
 import { Wait } from "../Store/atom"
 import MainView from "./MainView"
 import { NavSide } from "./NavSide"
+import { useProtheusObserver } from "../Hooks/useProtheusObserver"
 
 export const App: () => JSX.Element = () => {
 	const wait = useAtomValue(Wait)
+
+	useProtheusObserver()
 
 	return (
 		<Row className="app-row">

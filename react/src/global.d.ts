@@ -9,3 +9,7 @@ declare const totvstec: {
 	jsToAdvpl: (key: string, value?: any) => void
 	advplToJs: (key: string, value?: any) => void
 }
+
+interface Window {
+	observeProtheus: any
+}
